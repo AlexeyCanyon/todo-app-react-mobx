@@ -44,6 +44,7 @@ body {
     justify-content: center;
     align-items: center;
     color: Var(--primary);
+    height: 100vh;
 }
 
 .container {

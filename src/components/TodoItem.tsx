@@ -3,21 +3,24 @@ import { useDispatch } from "react-redux";
 import { Box } from "@mui/material";
 import IconCross from "../assets/iconCross.svg";
 import { completeTodo } from "../store/todos-slice";
+import { Todo } from "../mobxStore/todoStore";
+import { observe } from "mobx";
+import { observer } from "mobx-react-lite";
+import { useTodoStore } from "../mobxStore/rootStore";
 
 export type TodoProps = {
-    id: number;
-    name: string;
-    deleteHandler: () => {};
-    index: number;
-    completed: boolean;
+    todo: Todo;
+    deleteTodo: (todo: Todo) => void
 };
 
-const TodoItem = ({ id, name, deleteHandler, completed }: TodoProps) => {
-    const dispatch = useDispatch();
+const TodoItem = ({ todo, deleteTodo }: TodoProps) => {
+    const {completeTodo} = useTodoStore();
+    const {completed, id, name} = todo;
 
     function completedHandler() {
-        completed = !completed;
-        dispatch(completeTodo({ id: id, completed: completed }));
+        // Просто пример!!!!!
+        // todo.completed = !todo.completed;
+        completeTodo(todo);
     }
 
     return (
@@ -44,7 +47,7 @@ const TodoItem = ({ id, name, deleteHandler, completed }: TodoProps) => {
                 {name}
             </Box>
             <Box>
-                <button className="todo_item--btn" onClick={deleteHandler}>
+                <button className="todo_item--btn" onClick={() => deleteTodo(todo)}>
                     <img src={IconCross}></img>
                 </button>
             </Box>

@@ -1,35 +1,15 @@
 import { useState, useEffect } from "react";
-import { useSelector, useDispatch } from "react-redux";
 import { Box } from "@mui/material";
-import { deleteTodo, clearCompleted, TodosType } from "../store/todos-slice";
-import { RootState } from "../store/store";
 import TodoItem from "./TodoItem";
 import "./TodoList.css";
+import { observer } from "mobx-react-lite";
+import { useThemeStore, useTodoStore } from "../mobxStore/rootStore";
 
-export interface ThemeProps {
-    colorTheme: string;
-}
-const Todolist = ({ colorTheme }: ThemeProps) => {
+
+const Todolist = observer(() => {
+    const {todos, deleteTodo, clearCompleted, activeTodos, completedTodos} = useTodoStore();
+    const { theme } = useThemeStore();
     const [visibleTodos, setVisibleTodos] = useState("all");
-    const dispatch = useDispatch();
-    const todos = useSelector<RootState, TodosType[]>(
-        (state) => state.todos.value
-    );
-
-    const activeTodos =
-        todos &&
-        todos.filter(
-            (item: { id: number; name: string; completed: boolean }) => {
-                return item.completed == false;
-            }
-        );
-    const completedTodos =
-        todos &&
-        todos.filter(
-            (item: { id: number; name: string; completed: boolean }) => {
-                return item.completed == true;
-            }
-        );
 
     useEffect(() => {
         todos && localStorage.setItem("todos", JSON.stringify(todos));
@@ -58,22 +38,17 @@ const Todolist = ({ colorTheme }: ThemeProps) => {
                             index: number
                         ) => (
                             <TodoItem
-                                deleteHandler={() =>
-                                    dispatch(deleteTodo({ id: item.id }))
-                                }
-                                index={index}
                                 key={item.id}
-                                id={item.id}
-                                completed={item.completed}
-                                name={item.name}
+                                todo={item}
+                                deleteTodo={deleteTodo}
                             />
                         )
                     )}
-                <Box className="controls" data-theme={colorTheme}>
+                <Box className="controls" data-theme={theme}>
                     <Box>
                         <span>{currentTodos?.length | 0} items left</span>
                     </Box>
-                    <Box className="segregate" data-theme={colorTheme}>
+                    <Box className="segregate" data-theme={theme}>
                         <button
                             className={`segregate-btn ${
                                 visibleTodos == "all" && "active"
@@ -102,11 +77,11 @@ const Todolist = ({ colorTheme }: ThemeProps) => {
                             Completed
                         </button>
                     </Box>
-                    <Box className="clear" data-theme={colorTheme}>
+                    <Box className="clear" data-theme={theme}>
                         <button
                             className="clear-btn"
-                            data-theme={colorTheme}
-                            onClick={() => dispatch(clearCompleted({ todos }))}
+                            data-theme={theme}
+                            onClick={() => clearCompleted()}
                         >
                             Clear Completed
                         </button>
@@ -115,6 +90,6 @@ const Todolist = ({ colorTheme }: ThemeProps) => {
             </Box>
         </Box>
     );
-};
+});
 
 export default Todolist;

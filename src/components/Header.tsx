@@ -1,23 +1,17 @@
 import "./Header.css";
 import iconMoon from "../assets/iconMoon.svg";
 import iconSun from "../assets/iconSun.svg";
+import { observer } from "mobx-react-lite";
+import { useThemeStore } from "../mobxStore/rootStore";
 
-type colorThemeProp = {
-    colorTheme: string;
-    setColorTheme: (value: string) => void;
-};
-
-const Header = ({ colorTheme, setColorTheme }: colorThemeProp) => {
-    const switchTheme = () => {
-        const newTheme = colorTheme === "dark" ? "light" : "dark";
-        setColorTheme(newTheme);
-    };
+const Header = observer(() => {
+    const { switchTheme, theme } = useThemeStore();
 
     return (
         <div className="header">
             <h1>T O D O</h1>
             <div className="toggle_mode">
-                {colorTheme == "dark" ? (
+                {theme == "dark" ? (
                     <button onClick={switchTheme}>
                         <img src={iconSun} alt="lightmode" />
                     </button>
@@ -29,6 +23,6 @@ const Header = ({ colorTheme, setColorTheme }: colorThemeProp) => {
             </div>
         </div>
     );
-};
+});
 
 export default Header;

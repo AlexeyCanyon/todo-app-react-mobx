@@ -1,42 +1,31 @@
-import { createTheme, ThemeProvider, Box, useTheme } from "@mui/material";
+import { Box } from "@mui/material";
 import "./App.css";
 import Footer from "./components/Footer";
 import Header from "./components/Header";
 import Todolist from "./components/TodoList";
-import { useDispatch } from "react-redux";
-import { addTodo } from "./store/todos-slice";
-import React, { useEffect, useState } from "react";
-import useLocalStorage from "use-local-storage";
+import React, { FC, useEffect, useState } from "react";
+import { RootStore, useThemeStore, useTodoStore } from "./mobxStore/rootStore";
+import { observer } from "mobx-react-lite";
 
-const App: React.FC = () => {
-    const dispatch = useDispatch();
+const App = observer(() => {
+    const {addTodo} = useTodoStore();
+    const { theme } = useThemeStore();
+    
     const [name, setName] = useState<string>("");
-    const [colorTheme, setColorTheme] = useLocalStorage<string>(
-        "theme" ? "dark" : "light",
-        "dark"
-    );
 
     const addTodoHandler = () => {
         if (!name) {
             alert("You have to entere a name");
             return;
         }
-        dispatch(addTodo({ id: Math.random() * 1000, name, completed: false }));
+        addTodo({ id: Math.random() * 1000, name, completed: false });
         setName("");
     };
 
-    useEffect(() => {
-        let bgLight: string = "hsl(0, 0%, 98%)";
-        let bgDark: string = "hsl(235, 21%, 11%)";
-        colorTheme == "light"
-            ? (document.body.style.backgroundColor = bgLight)
-            : (document.body.style.backgroundColor = bgDark);
-    }, [colorTheme]);
-
     return (
-        <div className="container" data-theme={colorTheme}>
-            <Header colorTheme={colorTheme} setColorTheme={setColorTheme} />
-            <Box className="new_todo" data-theme={colorTheme}>
+        <div className="container" data-theme={theme}>
+            <Header />
+            <Box className="new_todo" data-theme={theme}>
                 <Box
                     className="checkbox_container"
                     sx={{
@@ -53,6 +42,11 @@ const App: React.FC = () => {
                     type="text"
                     placeholder="Create a new todo"
                     onChange={(e) => setName(e.target.value)}
+                    onKeyDown={(event) => {
+                        if (event.keyCode === 13) {
+                            addTodoHandler();
+                        }
+                    }}
                 />
                 <Box>
                     <button className="new_todo-btn" onClick={addTodoHandler}>
@@ -60,11 +54,10 @@ const App: React.FC = () => {
                     </button>
                 </Box>
             </Box>
-            <Todolist colorTheme={colorTheme} />
-            {/* <div className="reorder">Drag and drop to reorder list</div> */}
+            <Todolist />
             <Footer />
         </div>
     );
-};
+});
 
 export default App;
